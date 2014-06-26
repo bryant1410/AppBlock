@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="txt_white">#FFFFFF</color>
+    <color name="txt_black">#000000</color>
+    <color name="transparent">#00000000</color>
+
+    <color name="listview_split">#dadada</color>
+    <color name="listview_bg_sel">#d9d9d9</color>
+</resources>
