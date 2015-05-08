@@ -1,17 +1,16 @@
 #Android 应用程序屏蔽
 
-##当前版本：V1.0
 
-##更新记录
+这是一个应用屏幕程序，可以选择你想屏蔽的任何应用，让你放下手机，全心投入工作和学习。  
 
-1.版本V1.0
-> 第一版提交，开发“程序屏蔽”、“屏蔽程序选择”功能；
+现在就开始在工作时间屏蔽可能会消耗你生命的应用，去完成了不起的计划吧。  
+
 
 ##截图
 
 
- ![image](https://raw.githubusercontent.com/cundong/AppBlock/master/001.png)
+ ![image](https://github.com/cundong/AppBlock/blob/master/screenshot/001.png?raw=true)
  
- ![image](https://raw.githubusercontent.com/cundong/AppBlock/master/002.png)
+ ![image](https://github.com/cundong/AppBlock/blob/master/screenshot/002.png?raw=true)
  
- ![image](https://raw.githubusercontent.com/cundong/AppBlock/master/003.png)
+ ![image](https://github.com/cundong/AppBlock/blob/master/screenshot/003.png?raw=true)
