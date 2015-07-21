@@ -1,18 +1,21 @@
 package com.cundong.appblock.service;
 
-import java.util.ArrayList;
-
+import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 
 import com.cundong.appblock.WarningActivity;
 import com.cundong.appblock.util.BlockUtils;
 import com.cundong.appblock.util.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CoreService extends Service {
 
@@ -45,27 +48,41 @@ public class CoreService extends Service {
 		
 		public void run() {
 
-			Logger.getLogger().d( "block service is running..." );
+			Logger.getLogger().d("block service is running...");
 			
 			mBlockList = BlockUtils.getBlockList(getApplicationContext());
-			
-			ComponentName topActivity = mActivityManager.getRunningTasks(1)
-					.get(0).topActivity;
-			
-			if ( mBlockList!=null && mBlockList.contains(topActivity.getPackageName()) ) {
-				
-				Logger.getLogger().i( "block packageName：" + topActivity.getPackageName() );
-				Logger.getLogger().i( "block className：" + topActivity.getClassName() );
-				
-				Intent tancIntent = new Intent(getApplicationContext(), WarningActivity.class);
-				tancIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				startActivity(tancIntent);
+
+			String packageName;
+
+			if (Build.VERSION.SDK_INT >= 21) {
+				List<ActivityManager.AppTask> appTasks = getAppTasks();
+				ActivityManager.AppTask appTask = appTasks.get(0);
+
+				packageName = appTask.getTaskInfo().baseIntent.getComponent().getPackageName();
+			} else {
+
+				ComponentName topActivity = mActivityManager.getRunningTasks(1).get(0).topActivity;
+				packageName = topActivity.getPackageName();
+			}
+
+			if ( mBlockList!=null && mBlockList.contains(packageName) ) {
+				Intent intent = new Intent(getApplicationContext(), WarningActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				startActivity(intent);
 			}
 			
-			mHandler.postDelayed(mRunnable,
-					delayMillis);
+			mHandler.postDelayed(mRunnable, delayMillis);
 		}
 	};
+
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	private List<ActivityManager.AppTask> getAppTasks()  {
+		ActivityManager mgr = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+
+		List<ActivityManager.AppTask> tasks = mgr.getAppTasks();
+
+		return tasks;
+	}
 
 	@Override
 	public void onDestroy() {
@@ -73,6 +90,6 @@ public class CoreService extends Service {
 		mHandler.removeCallbacks(mRunnable);
 		super.onDestroy();
 		
-		Logger.getLogger().i( "onDestroy" );
+		Logger.getLogger().i("onDestroy");
 	}
 }
