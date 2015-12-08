@@ -1,95 +1,90 @@
 package com.cundong.appblock.service;
 
-import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 
 import com.cundong.appblock.WarningActivity;
 import com.cundong.appblock.util.BlockUtils;
 import com.cundong.appblock.util.Logger;
+import com.cundong.appblock.util.TopActivityUtils;
 
 import java.util.ArrayList;
-import java.util.List;
 
+/**
+ * Created by cundong on 2015/1/24.
+ *
+ * 后台默默运行着的Service
+ */
 public class CoreService extends Service {
 
-	private static final int delayMillis = 1000;
+    private static final int delayMillis = 1000;
 
-	private ActivityManager mActivityManager;
-	
-	private Handler mHandler;
-	
-	private ArrayList<String> mBlockList = null;
-	
-	@Override
-	public IBinder onBind(Intent arg0) {
-		return null;
-	}
+    private Context mContext;
+    private ActivityManager mActivityManager;
 
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		
-	    mActivityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-	    
-		mHandler = new Handler();
-		mHandler.postDelayed(mRunnable, delayMillis);
-		
-		Logger.getLogger().i( "onCreate" );
-	}
-	
-	private Runnable mRunnable = new Runnable() {
-		
-		public void run() {
+    private Handler mHandler;
 
-			Logger.getLogger().d("block service is running...");
-			
-			mBlockList = BlockUtils.getBlockList(getApplicationContext());
+    private ArrayList<String> mBlockList = null;
+    
+    private Runnable mRunnable = new Runnable() {
 
-			String packageName;
+        public void run() {
 
-			if (Build.VERSION.SDK_INT >= 21) {
-				List<ActivityManager.AppTask> appTasks = getAppTasks();
-				ActivityManager.AppTask appTask = appTasks.get(0);
+            Logger.getLogger().d("block service is running...");
 
-				packageName = appTask.getTaskInfo().baseIntent.getComponent().getPackageName();
-			} else {
+            mBlockList = BlockUtils.getBlockList(getApplicationContext());
 
-				ComponentName topActivity = mActivityManager.getRunningTasks(1).get(0).topActivity;
-				packageName = topActivity.getPackageName();
-			}
+            String packageName = null;
 
-			if ( mBlockList!=null && mBlockList.contains(packageName) ) {
-				Intent intent = new Intent(getApplicationContext(), WarningActivity.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				startActivity(intent);
-			}
-			
-			mHandler.postDelayed(mRunnable, delayMillis);
-		}
-	};
+            ComponentName componentName = TopActivityUtils.getTopActivity(mContext, mActivityManager);
 
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	private List<ActivityManager.AppTask> getAppTasks()  {
-		ActivityManager mgr = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+            if (componentName != null) {
+                packageName = componentName.getPackageName();
+                Logger.getLogger().i("packageName:" + packageName);
+            } else {
+                Logger.getLogger().e("getTopActivity Error!");
+            }
 
-		List<ActivityManager.AppTask> tasks = mgr.getAppTasks();
+            if (mBlockList != null && mBlockList.contains(packageName)) {
 
-		return tasks;
-	}
+                Intent intent = new Intent(getApplicationContext(), WarningActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
 
-	@Override
-	public void onDestroy() {
+            mHandler.postDelayed(mRunnable, delayMillis);
+        }
+    };
 
-		mHandler.removeCallbacks(mRunnable);
-		super.onDestroy();
-		
-		Logger.getLogger().i("onDestroy");
-	}
+    @Override
+    public IBinder onBind(Intent arg0) {
+        return null;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        mContext = this;
+        mActivityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+
+        mHandler = new Handler();
+        mHandler.postDelayed(mRunnable, delayMillis);
+
+        Logger.getLogger().i("onCreate");
+    }
+
+    @Override
+    public void onDestroy() {
+
+        mHandler.removeCallbacks(mRunnable);
+        super.onDestroy();
+
+        Logger.getLogger().i("onDestroy");
+    }
 }
