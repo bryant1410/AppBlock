@@ -3,7 +3,7 @@
 
     <item>
         <rotate
-            android:drawable="@drawable/abs__spinner_48_inner_holo"
+            android:drawable="@drawable/progress"
             android:duration="20"
             android:fromDegrees="0.0"
             android:pivotX="50.0%"

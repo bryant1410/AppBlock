@@ -167,7 +167,7 @@ public class TopActivityUtils {
     /**
      * 获取栈顶packageName，先通过getRunningAppProcesses方式获取，如果获取不到，再通过 UsageStats 方式获取
      *
-     * 注意：有的手机虽然是Android5.0（比如：LG G3 D859），但通过UsageStats方式娶不到
+     * 注意：有的手机虽然是Android5.0（比如：LG G3 D859），但通过UsageStats方式获取不到
      *
      * @param context
      * @return

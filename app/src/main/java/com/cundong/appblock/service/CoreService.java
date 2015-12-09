@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 /**
  * Created by cundong on 2015/1/24.
- *
+ * <p/>
  * 后台默默运行着的Service
  */
 public class CoreService extends Service {
@@ -30,7 +30,7 @@ public class CoreService extends Service {
     private Handler mHandler;
 
     private ArrayList<String> mBlockList = null;
-    
+
     private Runnable mRunnable = new Runnable() {
 
         public void run() {
